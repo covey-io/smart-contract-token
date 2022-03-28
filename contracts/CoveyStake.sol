@@ -3,6 +3,8 @@ pragma solidity ^0.8.11;
 contract CoveyStakingRewards {
   IERC777 public stakingToken;
 
+  address public owner;
+
   uint public rewardRate = 100;
   uint public lastUpdateTime;
   uint public rewardPerTokenStored;
@@ -14,8 +16,14 @@ contract CoveyStakingRewards {
   mapping(address => uint) private _balances;
 
   constructor(address _stakingToken) {
+    owner = msg.sender;
     stakingToken = IERC777(_stakingToken);
   }
+
+  modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 
   function rewardPerToken() public view returns (uint) {
     if(_totalSupply == 0) {
@@ -41,6 +49,13 @@ contract CoveyStakingRewards {
         rewards[account] = earned(account);
         userRewardPerTokenPaid[account] = rewardPerTokenStored;
         _;
+    }
+
+    /// @notice Change the reward rate for staked tokens
+    /// @dev Change the reward rate for staked tokens
+    /// @param newRate the rate to now reward for tokens staked
+    function changeRewardRate(uint newRate) public onlyOwner {
+        rewardRate = newRate;
     }
 
     function stake(uint _amount) external updateReward(msg.sender) {
