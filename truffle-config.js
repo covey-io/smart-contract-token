@@ -45,7 +45,7 @@ module.exports = {
         //
         development: {
             host: '127.0.0.1', // Localhost (default: none)
-            port: 8545, // Standard Ethereum port (default: none)
+            port: 7545, // Standard Ethereum port (default: none)
             network_id: '*', // Any network (default: none)
         },
         skale: {
@@ -71,7 +71,7 @@ module.exports = {
         mumbai: {
             provider: () =>
                 new HDWalletProvider(
-                    mnemonic,
+                    process.env.PRIVATE_KEY,
                     'https://rpc-mumbai.matic.today'
                 ),
             network_id: 80001,
@@ -80,6 +80,15 @@ module.exports = {
             skipDryRun: true,
             gas: 6000000,
             gasPrice: 40000000000,
+        },
+        rinkeby: {
+            provider: () =>
+                new HDWalletProvider(
+                    process.env.PRIVATE_KEY,
+                    'https://rinkeby.infura.io/v3/'
+                ),
+            network_id: 4,
+            gas: 4000000,
         },
         matic: {
             provider: () =>

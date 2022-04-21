@@ -1,9 +1,10 @@
 pragma solidity ^0.8.11;
 
-contract CoveyStakingRewards {
-  IERC777 public stakingToken;
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-  address public owner;
+contract CoveyStaking is Ownable {
+  IERC777 public stakingToken;
 
   uint public rewardRate = 100;
   uint public lastUpdateTime;
@@ -16,15 +17,8 @@ contract CoveyStakingRewards {
   mapping(address => uint) private _balances;
 
   constructor(address _stakingToken) {
-    owner = msg.sender;
     stakingToken = IERC777(_stakingToken);
   }
-
-  modifier onlyOwner() {
-        require(msg.sender == owner);
-        _;
-    }
-
   function rewardPerToken() public view returns (uint) {
     if(_totalSupply == 0) {
       return rewardPerTokenStored;
