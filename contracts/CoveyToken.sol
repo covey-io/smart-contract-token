@@ -6,11 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CoveyToken is ERC777, Ownable {
 
-  struct Airdrop {
-    address to;
-    uint amount;
-  }
-
   constructor (uint initialSupply, address[] memory defaultOperators) ERC777("Covey", "CVY", defaultOperators) {
     _mint(msg.sender, initialSupply, "", "");
   }
@@ -32,10 +27,10 @@ contract CoveyToken is ERC777, Ownable {
     );
   }
 
-  function airdrop  (address[] memory recipients, uint256[] memory amounts) public _onlyOwnerOrOperators whenDropIsActive {
+  function airdrop  (address[] memory recipients, uint256[] memory amounts) public onlyOwner {
     for(uint i = 0; i < recipients.length; i++) {
       uint256 toSend = amounts[i] * 10**18;
-      send(recipients[i], toSend, "Airdrop");
+      send(recipients[i], toSend, "Covey Airdrop");
     }
   }
 }
