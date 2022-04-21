@@ -28,14 +28,14 @@ contract CoveyToken is ERC777, Ownable {
 
   function isActive() view internal returns (bool) {
     return (
-        balanceOf(address(this)) > 0
+        balanceOf(owner()) > 0
     );
   }
 
   function airdrop  (address[] memory recipients, uint256[] memory amounts) public _onlyOwnerOrOperators whenDropIsActive {
     for(uint i = 0; i < recipients.length; i++) {
       uint256 toSend = amounts[i] * 10**18;
-      transferFrom(address(this),recipients[i], toSend);
+      send(recipients[i], toSend, "Airdrop");
     }
   }
 }
