@@ -41,7 +41,10 @@ contract CoveyToken is ERC777, Ownable {
     
 
     if(block.timestamp > _tokenLocks[msg.sender] && _tokenLocks[msg.sender] != 0) {
-      removeTokenLock(msg.sender, amount);
+      if(_tokenLocks[msg.sender] != 0) {
+        delete _tokenLocks[msg.sender];
+        emit TokensReleased(msg.sender, amount);
+      }
     }
     super.transfer(recipient, amount);
   }
@@ -57,10 +60,14 @@ contract CoveyToken is ERC777, Ownable {
       super.send(recipient, amount, data);
   }
 
-  function airdrop  (address[] memory recipients, uint256[] memory amounts) public onlyOwner {
+  function airdrop  (address[] memory recipients, uint256[] memory amounts, uint256[] memory lockForSeconds) public onlyOwner {
     for(uint i = 0; i < recipients.length; i++) {
       uint256 toSend = amounts[i] * 10**18;
-      send(recipients[i], toSend, "Covey Airdrop");
+      if(lockForSeconds[i] != 0) {
+        sendLocked(recipients[i], amounts[i], lockForSeconds[i]);
+      } else {
+        send(recipients[i], toSend, "Covey Airdrop");
+      }
     }
   }
 

@@ -72,7 +72,7 @@ module.exports = {
             provider: () =>
                 new HDWalletProvider(
                     process.env.PRIVATE_KEY,
-                    'https://rpc-mumbai.matic.today'
+                    'https://matic-mumbai.chainstacklabs.com'
                 ),
             network_id: 80001,
             confirmations: 2,
