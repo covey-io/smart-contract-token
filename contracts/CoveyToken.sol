@@ -6,22 +6,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CoveyToken is ERC777, Ownable {
 
-  mapping(address => uint) _tokenLocks; 
+  struct TokenLock {
+    uint256 amount;
+    uint unlockAt;
+  }
+
+  mapping(address => TokenLock) _tokenLocks; 
 
   constructor (uint initialSupply, address[] memory defaultOperators) ERC777("Covey", "CVY", defaultOperators) {
     _mint(msg.sender, initialSupply, "", "");
   }
 
-  modifier _onlyOwnerOrOperators {
-    require(msg.sender == address(this) || msg.sender == owner() || isOperatorFor(msg.sender, address(this)), "Only owner or operator can call this function");
-    _;
-  }
-
-  modifier whenDropIsActive() {
-    assert(isActive());
-
-    _;
-  }
 
   event LockedTokensSent(address to, uint256 amount, uint unlockTime);
 
@@ -33,32 +28,27 @@ contract CoveyToken is ERC777, Ownable {
     );
   }
 
-  function transfer(address recipient, uint256 amount) public override returns(bool) {
-    if(_tokenLocks[msg.sender] != 0 && block.timestamp < _tokenLocks[msg.sender]) {
-      require(block.timestamp > _tokenLocks[msg.sender], "Tokens have yet to release");
-    }
-    
-    
+  function _beforeTokenTransfer(
+      address operator,
+      address from,
+      address to,
+      uint256 amount
+  ) internal virtual override {
+    if(_tokenLocks[from].amount != 0 && block.timestamp < _tokenLocks[from].unlockAt) {
+      uint256 currentBalance = balanceOf(from);
+      uint256 balanceAfter = currentBalance - amount;
 
-    if(block.timestamp > _tokenLocks[msg.sender] && _tokenLocks[msg.sender] != 0) {
-      if(_tokenLocks[msg.sender] != 0) {
-        delete _tokenLocks[msg.sender];
-        emit TokensReleased(msg.sender, amount);
-      }
+      require(balanceAfter > _tokenLocks[from].amount, "Amount being transferred exceeds available unlocked balance");
     }
-    super.transfer(recipient, amount);
+    
+    if(block.timestamp > _tokenLocks[from].unlockAt && _tokenLocks[from].amount != 0) {
+      delete _tokenLocks[from];
+      emit TokensReleased(from, amount);
+    }
+
+    super._beforeTokenTransfer(operator,from,to,amount);
   }
 
-  function send(address recipient, uint256 amount, bytes memory data) public override {
-    if(_tokenLocks[msg.sender] != 0 && block.timestamp < _tokenLocks[msg.sender]) {
-      require(block.timestamp > _tokenLocks[msg.sender], "Tokens have yet to release");
-    }
-    
-    if(block.timestamp > _tokenLocks[msg.sender] && _tokenLocks[msg.sender] != 0) {
-      removeTokenLock(msg.sender, amount);
-    }
-      super.send(recipient, amount, data);
-  }
 
   function airdrop  (address[] memory recipients, uint256[] memory amounts, uint256[] memory lockForSeconds) public onlyOwner {
     for(uint i = 0; i < recipients.length; i++) {
@@ -73,15 +63,16 @@ contract CoveyToken is ERC777, Ownable {
 
   function sendLocked(address to, uint256 amount, uint timeToLock) public onlyOwner {
     require(timeToLock > 0, "Time to lock must be more than 0");
-    uint unlockTime = block.timestamp + timeToLock;
-    _tokenLocks[to] = unlockTime;
+    uint unlockAt = block.timestamp + timeToLock;
+    _tokenLocks[to].amount = _tokenLocks[to].amount + amount;
+    _tokenLocks[to].unlockAt = unlockAt;
     uint256 toSend = amount * 10**18;
     send(to,toSend, "Locked Tokens");
-    emit LockedTokensSent(to, toSend, unlockTime);
+    emit LockedTokensSent(to, toSend, unlockAt);
   }
 
   function removeTokenLock(address to, uint256 amount) public onlyOwner {
-    if(_tokenLocks[to] != 0) {
+    if(_tokenLocks[to].amount != 0) {
       delete _tokenLocks[to];
       emit TokensReleased(to, amount);
     }
