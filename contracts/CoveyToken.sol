@@ -64,9 +64,9 @@ contract CoveyToken is ERC777, Ownable {
   function sendLocked(address to, uint256 amount, uint timeToLock) public onlyOwner {
     require(timeToLock > 0, "Time to lock must be more than 0");
     uint unlockAt = block.timestamp + timeToLock;
-    _tokenLocks[to].amount = _tokenLocks[to].amount + amount;
-    _tokenLocks[to].unlockAt = unlockAt;
     uint256 toSend = amount * 10**18;
+    _tokenLocks[to].amount = _tokenLocks[to].amount + toSend;
+    _tokenLocks[to].unlockAt = unlockAt;
     send(to,toSend, "Locked Tokens");
     emit LockedTokensSent(to, toSend, unlockAt);
   }

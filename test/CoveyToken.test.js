@@ -13,9 +13,36 @@ contract('CoveyToken', async (accounts) => {
             from: accounts[0],
         });
 
+        const balance = await coveyToken.balanceOf(accounts[1]);
+
         let err = null;
         try {
-            await coveyToken.transfer(accounts[0], 100, { from: accounts[1] });
+            await coveyToken.transfer(accounts[0], 100000000000000000000, {
+                from: accounts[1],
+            });
+        } catch (e) {
+            err = e;
+        }
+
+        assert.ok(err instanceof Error);
+    });
+
+    it('does not allow sending an excess of tokens when tokens are locked', async () => {
+        const coveyToken = await CoveyToken.deployed();
+
+        await coveyToken.sendLocked(accounts[1], 50, 300, {
+            from: accounts[0],
+        });
+
+        await coveyToken.transfer(accounts[1], '50000000000000000000', {
+            from: accounts[0],
+        });
+
+        let err = null;
+        try {
+            await coveyToken.transfer(accounts[0], '60000000000000000000', {
+                from: accounts[1],
+            });
         } catch (e) {
             err = e;
         }
