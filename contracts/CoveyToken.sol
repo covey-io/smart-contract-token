@@ -11,22 +11,16 @@ contract CoveyToken is ERC777, Ownable {
     uint unlockAt;
   }
 
-  mapping(address => TokenLock) _tokenLocks; 
+  mapping(address => TokenLock[]) _tokenLocks; 
 
   constructor (uint initialSupply, address[] memory defaultOperators) ERC777("Covey", "CVY", defaultOperators) {
     _mint(msg.sender, initialSupply, "", "");
   }
 
 
-  event LockedTokensSent(address to, uint256 amount, uint unlockTime);
+  event LockedTokensSent(address _adr, uint256 amount, uint unlockTime);
 
-  event TokensReleased(address to, uint256 amount);
-
-  function isActive() view internal returns (bool) {
-    return (
-        balanceOf(owner()) > 0
-    );
-  }
+  event TokensReleased(address _adr, uint256 amount);
 
   function _beforeTokenTransfer(
       address operator,
@@ -34,16 +28,25 @@ contract CoveyToken is ERC777, Ownable {
       address to,
       uint256 amount
   ) internal virtual override {
-    if(_tokenLocks[from].amount != 0 && block.timestamp < _tokenLocks[from].unlockAt) {
+    uint256 lockedAmount = 0;
+
+    if(_tokenLocks[from].length > 0) {
+      for(uint256 i = 0; i < _tokenLocks[from].length; i++) {
+        if(_tokenLocks[from][i].amount != 0 && block.timestamp < _tokenLocks[from][i].unlockAt) {
+          lockedAmount += _tokenLocks[from][i].amount;
+        }
+        
+        if(block.timestamp > _tokenLocks[from][i].unlockAt && _tokenLocks[from][i].amount != 0) {
+          _removeTokenLock(from, i);
+        }
+      }
+    }
+
+    if(lockedAmount > 0) {
       uint256 currentBalance = balanceOf(from);
       uint256 balanceAfter = currentBalance - amount;
 
-      require(balanceAfter > _tokenLocks[from].amount, "Amount being transferred exceeds available unlocked balance");
-    }
-    
-    if(block.timestamp > _tokenLocks[from].unlockAt && _tokenLocks[from].amount != 0) {
-      delete _tokenLocks[from];
-      emit TokensReleased(from, amount);
+      require(balanceAfter > lockedAmount, "Amount being transferred exceeds available unlocked balance");
     }
 
     super._beforeTokenTransfer(operator,from,to,amount);
@@ -65,16 +68,23 @@ contract CoveyToken is ERC777, Ownable {
     require(timeToLock > 0, "Time to lock must be more than 0");
     uint unlockAt = block.timestamp + timeToLock;
     uint256 toSend = amount * 10**18;
-    _tokenLocks[to].amount = _tokenLocks[to].amount + toSend;
-    _tokenLocks[to].unlockAt = unlockAt;
+    TokenLock memory tokenLock = TokenLock({
+      amount: toSend,
+      unlockAt: unlockAt
+    });
+    _tokenLocks[to].push(tokenLock);
     send(to,toSend, "Locked Tokens");
     emit LockedTokensSent(to, toSend, unlockAt);
   }
 
-  function removeTokenLock(address to, uint256 amount) public onlyOwner {
-    if(_tokenLocks[to].amount != 0) {
-      delete _tokenLocks[to];
-      emit TokensReleased(to, amount);
+  function _removeTokenLock(address _adr, uint256 lockIndex) private {
+    if(_tokenLocks[_adr][lockIndex].amount != 0) {
+      emit TokensReleased(_adr, _tokenLocks[_adr][lockIndex].amount);
+      delete _tokenLocks[_adr][lockIndex];
     }
+  }
+
+  function removeTokenLock(address _adr, uint256 lockIndex) public onlyOwner {
+    _removeTokenLock(_adr, lockIndex);
   }
 }
