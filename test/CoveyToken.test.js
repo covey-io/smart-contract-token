@@ -70,4 +70,26 @@ contract('CoveyToken', async (accounts) => {
 
         assert.equal(err, null);
     });
+
+    it('does not allow non owners to mint', async () => {
+        const coveyToken = await CoveyToken.deployed();
+
+        let err = null;
+        try {
+            await coveyToken.mint(
+                accounts[2],
+                '30000000000000000000',
+                null,
+                null,
+                {
+                    from: accounts[3],
+                }
+            );
+        } catch (e) {
+            console.log(e);
+            err = e;
+        }
+
+        assert.equal(err, null);
+    });
 });

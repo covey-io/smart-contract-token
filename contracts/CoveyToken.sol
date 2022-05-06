@@ -9,18 +9,28 @@ contract CoveyToken is ERC777, Ownable {
   struct TokenLock {
     uint256 amount;
     uint unlockAt;
+    bytes32 reason;
+  }
+
+  struct Airdrop {
+    address recipient;
+    uint256 amount;
+    uint  lockForSeconds;
+    bytes32 reason;
   }
 
   mapping(address => TokenLock[]) _tokenLocks; 
+
+  uint _maxSupply = 1000000000000000000000000000;
 
   constructor (uint initialSupply, address[] memory defaultOperators) ERC777("Covey", "CVY", defaultOperators) {
     _mint(msg.sender, initialSupply, "", "");
   }
 
 
-  event LockedTokensSent(address _adr, uint256 amount, uint unlockTime);
+  event Lock(address indexed _adr, uint256 amount, uint indexed unlockTime, bytes32 indexed reason);
 
-  event TokensReleased(address _adr, uint256 amount);
+  event Unlock(address indexed _adr, uint256 amount);
 
   function _beforeTokenTransfer(
       address operator,
@@ -37,7 +47,7 @@ contract CoveyToken is ERC777, Ownable {
         }
         
         if(block.timestamp > _tokenLocks[from][i].unlockAt && _tokenLocks[from][i].amount != 0) {
-          _removeTokenLock(from, i);
+          _unlock(from, i);
         }
       }
     }
@@ -52,39 +62,79 @@ contract CoveyToken is ERC777, Ownable {
     super._beforeTokenTransfer(operator,from,to,amount);
   }
 
+  function mint(
+    address account,
+    uint256 amount,
+    bytes memory userData,
+    bytes memory operatorData) public onlyOwner {
+      require(totalSupply() + amount <= _maxSupply);
+      super._mint(account, amount, userData, operatorData);
+  }
 
-  function airdrop  (address[] memory recipients, uint256[] memory amounts, uint256[] memory lockForSeconds) public onlyOwner {
-    for(uint i = 0; i < recipients.length; i++) {
-      uint256 toSend = amounts[i] * 10**18;
-      if(lockForSeconds[i] != 0) {
-        sendLocked(recipients[i], amounts[i], lockForSeconds[i]);
+  function lockedBalanceOf(address tokenHolder) public view returns(uint256) {
+    uint256 lockedAmount = 0;
+    if(_tokenLocks[tokenHolder].length > 0) {
+      for(uint256 i = 0; i < _tokenLocks[tokenHolder].length; i++) {
+        if(_tokenLocks[tokenHolder][i].amount != 0 && block.timestamp < _tokenLocks[tokenHolder][i].unlockAt) {
+          lockedAmount += _tokenLocks[tokenHolder][i].amount;
+        }  
+      }
+    }
+
+    return lockedAmount;
+  }
+
+  function unlockedBalancedOf(address tokenHolder) public view returns(uint256) {
+    uint256 lockedAmount = lockedBalanceOf(tokenHolder);
+
+    return balanceOf(tokenHolder) - lockedAmount;
+  }
+
+  function getLocks(address tokenHolder) public view returns(TokenLock[] memory) {
+    return _tokenLocks[tokenHolder];
+  }
+
+
+  function maxSupply() public view returns(uint) {
+    return _maxSupply;
+  }
+
+
+  function airdrop(Airdrop[] memory airdrops) public  {
+    for(uint i = 0; i < airdrops.length; i++) {
+      uint256 toSend = airdrops[i].amount * 10**18;
+      if(airdrops[i].lockForSeconds != 0) {
+        sendLocked(airdrops[i].recipient, airdrops[i].amount, airdrops[i].lockForSeconds, "Locked CVY airdrop");
       } else {
-        send(recipients[i], toSend, "Covey Airdrop");
+        send(airdrops[i].recipient, toSend, "CVY Airdrop");
       }
     }
   }
 
-  function sendLocked(address to, uint256 amount, uint timeToLock) public onlyOwner {
+  function sendLocked(address to, uint256 amount, uint timeToLock, bytes32 reason) public  {
     require(timeToLock > 0, "Time to lock must be more than 0");
+    require(to != address(0), "transfer to the zero address");
+
     uint unlockAt = block.timestamp + timeToLock;
     uint256 toSend = amount * 10**18;
     TokenLock memory tokenLock = TokenLock({
       amount: toSend,
-      unlockAt: unlockAt
+      unlockAt: unlockAt,
+      reason: reason
     });
-    _tokenLocks[to].push(tokenLock);
     send(to,toSend, "Locked Tokens");
-    emit LockedTokensSent(to, toSend, unlockAt);
+    _tokenLocks[to].push(tokenLock);
+    emit Lock(to, toSend, unlockAt, reason);
   }
 
-  function _removeTokenLock(address _adr, uint256 lockIndex) private {
+  function _unlock(address _adr, uint256 lockIndex) private {
     if(_tokenLocks[_adr][lockIndex].amount != 0) {
-      emit TokensReleased(_adr, _tokenLocks[_adr][lockIndex].amount);
+      emit Unlock(_adr, _tokenLocks[_adr][lockIndex].amount);
       delete _tokenLocks[_adr][lockIndex];
     }
   }
 
-  function removeTokenLock(address _adr, uint256 lockIndex) public onlyOwner {
-    _removeTokenLock(_adr, lockIndex);
+  function unlock(address _adr, uint256 lockIndex) public onlyOwner {
+    _unlock(_adr, lockIndex);
   }
 }

@@ -12389,62 +12389,9 @@
     "name": "solc",
     "version": "0.8.11+commit.d7f03943.Emscripten.clang"
   },
-  "networks": {
-    "5777": {
-      "events": {
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0xB56E174B2D062eacA40B4EFb850fC0D076Fe2B08",
-      "transactionHash": "0xb847c859bf5a86a487e56ac841db1bfe9312e7e01cb7f11e3f8c953fec923146"
-    },
-    "80001": {
-      "events": {
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0x7dD41e2B887457041BBd89c8e40Bf68e7cBEE258",
-      "transactionHash": "0x143fe74addf6b90acf154780c761ef351873e135779bfbdd0d535f712fad2bc6"
-    }
-  },
+  "networks": {},
   "schemaVersion": "3.4.4",
-  "updatedAt": "2022-05-04T15:34:01.473Z",
+  "updatedAt": "2022-05-06T15:15:44.201Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
