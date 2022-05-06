@@ -85,10 +85,11 @@ module.exports = {
             provider: () =>
                 new HDWalletProvider(
                     process.env.PRIVATE_KEY,
-                    'https://rinkeby.infura.io/v3/'
+                    'https://rinkeby.infura.io/v3/' + process.env.INFURA_KEY
                 ),
             network_id: 4,
-            gas: 4000000,
+            gas: 20000000,
+            gasPrice: 10000000000,
         },
         matic: {
             provider: () =>

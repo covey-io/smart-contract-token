@@ -118,4 +118,28 @@ contract('CoveyToken', async (accounts) => {
 
         assert.equal(err, null);
     });
+
+    it('can do airdrops', async () => {
+        const coveyToken = await CoveyToken.deployed();
+
+        let err = null;
+        try {
+            const airdrop = [
+                {
+                    recipient: '0x0367c6506e90C5278F832AA11FFAC3C09d355552',
+                    amount: 10,
+                    lockForSeconds: 0,
+                    reason: '',
+                },
+            ];
+            await coveyToken.airdrop(airdrop, { from: accounts[0] });
+        } catch (e) {
+            console.log(e.reason);
+            err = e;
+        }
+
+        const balance = await coveyToken.balanceOf(airdrop[0].recipient);
+        console.log(balance);
+        assert.equal(err, null);
+    });
 });
