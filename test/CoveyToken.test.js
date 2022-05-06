@@ -71,22 +71,48 @@ contract('CoveyToken', async (accounts) => {
         assert.equal(err, null);
     });
 
-    it('does not allow non owners to mint', async () => {
+    it('does not allow non owner to mint', async () => {
         const coveyToken = await CoveyToken.deployed();
 
         let err = null;
         try {
-            await coveyToken.mint(
-                accounts[2],
-                '30000000000000000000',
-                null,
-                null,
-                {
-                    from: accounts[3],
-                }
-            );
+            await coveyToken.mint(accounts[2], '30000000000000000000', [], [], {
+                from: accounts[3],
+            });
         } catch (e) {
-            console.log(e);
+            err = e;
+        }
+
+        assert.ok(err instanceof Error);
+        assert.equal(err.reason, 'Ownable: caller is not the owner');
+    });
+
+    it('does not allow minting new tokens to exceed maxSupply', async () => {
+        const coveyToken = await CoveyToken.deployed();
+
+        let err = null;
+        try {
+            await coveyToken.mint(accounts[2], '30000000000000000000', [], [], {
+                from: accounts[0],
+            });
+        } catch (e) {
+            err = e;
+        }
+
+        assert.ok(err instanceof Error);
+        assert.equal(err.reason, 'Token Minting cannot exceed Max Supply');
+    });
+
+    it('allows minting new tokens when totalSupply is less than maxSupply', async () => {
+        const coveyToken = await CoveyToken.deployed();
+
+        let err = null;
+        try {
+            await coveyToken.burn('30000000000000000000', []);
+            await coveyToken.mint(accounts[2], '30000000000000000000', [], [], {
+                from: accounts[0],
+            });
+        } catch (e) {
             err = e;
         }
 

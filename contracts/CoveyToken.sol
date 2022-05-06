@@ -9,14 +9,14 @@ contract CoveyToken is ERC777, Ownable {
   struct TokenLock {
     uint256 amount;
     uint unlockAt;
-    bytes32 reason;
+    string reason;
   }
 
   struct Airdrop {
     address recipient;
     uint256 amount;
     uint  lockForSeconds;
-    bytes32 reason;
+    string reason;
   }
 
   mapping(address => TokenLock[]) _tokenLocks; 
@@ -28,7 +28,7 @@ contract CoveyToken is ERC777, Ownable {
   }
 
 
-  event Lock(address indexed _adr, uint256 amount, uint indexed unlockTime, bytes32 indexed reason);
+  event Lock(address indexed _adr, uint256 amount, uint indexed unlockTime, string indexed reason);
 
   event Unlock(address indexed _adr, uint256 amount);
 
@@ -67,7 +67,7 @@ contract CoveyToken is ERC777, Ownable {
     uint256 amount,
     bytes memory userData,
     bytes memory operatorData) public onlyOwner {
-      require(totalSupply() + amount <= _maxSupply);
+      require(totalSupply() + amount <= _maxSupply, "Token Minting cannot exceed Max Supply");
       super._mint(account, amount, userData, operatorData);
   }
 
@@ -111,7 +111,7 @@ contract CoveyToken is ERC777, Ownable {
     }
   }
 
-  function sendLocked(address to, uint256 amount, uint timeToLock, bytes32 reason) public  {
+  function sendLocked(address to, uint256 amount, uint timeToLock, string memory reason) public  {
     require(timeToLock > 0, "Time to lock must be more than 0");
     require(to != address(0), "transfer to the zero address");
 
