@@ -12,7 +12,7 @@ contract CoveyToken is ERC777, Ownable {
     string reason;
   }
 
-  struct Airdrop {
+  struct _Airdrop {
     address recipient;
     uint256 amount;
     uint  lockForSeconds;
@@ -31,6 +31,8 @@ contract CoveyToken is ERC777, Ownable {
   event Lock(address indexed _adr, uint256 amount, uint indexed unlockTime, string indexed reason);
 
   event Unlock(address indexed _adr, uint256 amount);
+
+  event Airdrop(address indexed _adr, uint256 amount);
 
   function _beforeTokenTransfer(
       address operator,
@@ -100,13 +102,14 @@ contract CoveyToken is ERC777, Ownable {
   }
 
 
-  function airdrop(Airdrop[] memory airdrops) public  {
+  function airdrop(_Airdrop[] memory airdrops) public  {
     for(uint i = 0; i < airdrops.length; i++) {
       uint256 toSend = airdrops[i].amount * 10**18;
       if(airdrops[i].lockForSeconds != 0) {
         sendLocked(airdrops[i].recipient, airdrops[i].amount, airdrops[i].lockForSeconds, "Locked CVY airdrop");
       } else {
         send(airdrops[i].recipient, toSend, "CVY Airdrop");
+        emit Airdrop(airdrops[i].recipient, toSend);
       }
     }
   }

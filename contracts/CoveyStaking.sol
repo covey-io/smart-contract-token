@@ -2,92 +2,45 @@ pragma solidity ^0.8.11;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC777/IERC777.sol";
+import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
-contract CoveyStaking is Ownable {
+contract CoveyStaking is Initializable {
   IERC777 public stakingToken;
+  address owner;
 
-  uint public rewardRate = 100;
-  uint public lastUpdateTime;
-  uint public rewardPerTokenStored;
+  mapping(address => uint) private _stakes;
 
-  mapping(address => uint) public userRewardPerTokenPaid;
-  mapping(address => uint) public rewards;
+  mapping(address => uint) private _unstakes;
 
-  uint private _totalSupply;
-  mapping(address => uint) private _balances;
+  event Stake(address indexed _adr, uint amount);
+  
+  event Unstake(address indexed _adr, uint amount);
 
-  constructor(address _stakingToken) {
-    stakingToken = IERC777(_stakingToken);
+  event CancelledUnstake(address indexed _adr);
+
+  function initialize(address _stakingToken) public initializer {
+        owner = msg.sender;
+        stakingToken = IERC777(_stakingToken);
+    }
+
+  function stake(uint amount) public {
+      stakingToken.send(address(this), amount, "Covey Stake");
+      _stakes[msg.sender] = _stakes[msg.sender] + amount;
+      emit Stake(msg.sender, amount);
   }
-  function rewardPerToken() public view returns (uint) {
-    if(_totalSupply == 0) {
-      return rewardPerTokenStored;
-    }
 
-    return
-            rewardPerTokenStored +
-            (((block.timestamp - lastUpdateTime) * rewardRate * 1e18) / _totalSupply);
+  function unstake(uint amount) public {
+      require(_stakes[msg.sender] != 0, "Has not staked");
+      require(_stakes[msg.sender] - amount >= 0, "Cannot unstake more than total staked amount");
+      _unstakes[msg.sender] = _unstakes[msg.sender] + amount;
+      emit Unstake(msg.sender, amount);
   }
 
-   function earned(address account) public view returns (uint) {
-        return
-            ((_balances[account] *
-                (rewardPerToken() - userRewardPerTokenPaid[account])) / 1e18) +
-            rewards[account];
-    }
-
-    modifier updateReward(address account) {
-        rewardPerTokenStored = rewardPerToken();
-        lastUpdateTime = block.timestamp;
-
-        rewards[account] = earned(account);
-        userRewardPerTokenPaid[account] = rewardPerTokenStored;
-        _;
-    }
-
-    /// @notice Change the reward rate for staked tokens
-    /// @dev Change the reward rate for staked tokens
-    /// @param newRate the rate to now reward for tokens staked
-    function changeRewardRate(uint newRate) public onlyOwner {
-        rewardRate = newRate;
-    }
-
-    function stake(uint _amount) external updateReward(msg.sender) {
-        _totalSupply += _amount;
-        _balances[msg.sender] += _amount;
-        stakingToken.transferFrom(msg.sender, address(this), _amount);
-    }
-
-    function withdraw(uint _amount) external updateReward(msg.sender) {
-        _totalSupply -= _amount;
-        _balances[msg.sender] -= _amount;
-        stakingToken.transfer(msg.sender, _amount);
-    }
-
-    function getReward() external updateReward(msg.sender) {
-        uint reward = rewards[msg.sender];
-        rewards[msg.sender] = 0;
-        stakingToken.transfer(msg.sender, reward);
-    }
-}
-
-interface IERC777 {
-    function totalSupply() external view returns (uint);
-
-    function balanceOf(address account) external view returns (uint);
-
-    function transfer(address recipient, uint amount) external returns (bool);
-
-    function allowance(address owner, address spender) external view returns (uint);
-
-    function approve(address spender, uint amount) external returns (bool);
-
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint amount
-    ) external returns (bool);
-
-    event Transfer(address indexed from, address indexed to, uint value);
-    event Approval(address indexed owner, address indexed spender, uint value);
+  function cancelUnstake() public {
+      require(_unstakes[msg.sender] > 0, "No unstake to cancel");
+      delete _unstakes[msg.sender];
+      emit CancelledUnstake(msg.sender);
+  }
+  
 }
