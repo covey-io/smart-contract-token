@@ -83,6 +83,10 @@ contract CoveyStaking is Initializable {
               stakingToken.send(stakers[i], _unstakedAmounts[stakers[i]], "Stake dispensal");
               _stakedAmounts[stakers[i]] = _stakedAmounts[stakers[i]] - _unstakedAmounts[stakers[i]];
               _unstakedAmounts[stakers[i]] = 0;
+
+              if(_stakedAmounts[stakers[i]] <= 0) {
+                  delete stakers[i];
+              }
               emit StakeDispensed(stakers[i], _unstakedAmounts[stakers[i]]);
           }
       }
