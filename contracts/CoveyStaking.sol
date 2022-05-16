@@ -4,9 +4,14 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC777/IERC777.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
+import "@openzeppelin/contracts/token/ERC777/IERC777Sender.sol";
+import "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
+import "@openzeppelin/contracts/interfaces/IERC1820Registry.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC1820Implementer.sol";
 
-contract CoveyStaking is Initializable {
+contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820Implementer  {
   IERC777 public stakingToken;
+
   address owner;
 
 
@@ -16,6 +21,17 @@ contract CoveyStaking is Initializable {
 
 
   address[] public stakers;
+
+  IERC1820Registry public registry;
+    
+    // keccak256('ERC777TokensRecipient')
+    bytes32 constant private TOKENS_RECIPIENT_INTERFACE_HASH
+        = 0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
+
+
+   // keccak256("ERC777TokensSender")
+    bytes32 constant private TOKENS_SENDER_INTERFACE_HASH =
+        0x29ddb589b1fb5fc7cf394961c1adf5f8c6454761adf795e67fe149f658abe895;
 
   event Staked(address indexed _adr, uint amount);
   
@@ -32,9 +48,44 @@ contract CoveyStaking is Initializable {
       _;
   }
 
-  function initialize(address _stakingToken) public initializer {
+  function initialize(IERC777 _stakingToken) public initializer {
         owner = msg.sender;
-        stakingToken = IERC777(_stakingToken);
+        stakingToken = _stakingToken;
+
+        registry = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
+
+        registry.setInterfaceImplementer(
+            address(this),
+            TOKENS_RECIPIENT_INTERFACE_HASH,
+            address(this)
+        );
+    }
+
+   function tokensReceived(
+        address operator,
+        address from,
+        address to,
+        uint256 amount,
+        bytes calldata userData,
+        bytes calldata operatorData
+    ) external {
+
+    }
+
+    function tokensToSend(
+        address operator,
+        address from,
+        address to,
+        uint256 amount,
+        bytes calldata userData,
+        bytes calldata operatorData
+    ) external {}
+
+    function registerHookForAccount(address account) public {
+        _registerInterfaceForAddress(
+            TOKENS_SENDER_INTERFACE_HASH,
+            account
+        );
     }
 
   function stake(uint amount) public {
@@ -91,4 +142,6 @@ contract CoveyStaking is Initializable {
           }
       }
   }
+
+
 }
