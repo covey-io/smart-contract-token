@@ -20,8 +20,15 @@ contract('CoveyStaking', async (accounts) => {
             await coveyToken.authorizeOperator(coveyStaking.address, {
                 from: accounts[5],
             });
-            await coveyStaking.stake('2000000000000000000', {
+            const tx = await coveyStaking.stake('2000000000000000000', {
                 from: accounts[5],
+            });
+
+            truffleAssert.eventEmitted(tx, 'Staked', (ev) => {
+                return (
+                    ev._adr === accounts[5] &&
+                    parseInt(ev.amount) === 2000000000000000000
+                );
             });
         } catch (e) {
             err = e;
@@ -38,6 +45,27 @@ contract('CoveyStaking', async (accounts) => {
         );
 
         assert.isAtLeast(parseInt(coveyStakingBalance), 2000000000000000000);
+    });
+
+    it('does not allow users to stake more than their available balance', async () => {
+        const coveyToken = await CoveyToken.deployed();
+        const coveyStaking = await CoveyStaking.deployed();
+
+        let err = null;
+
+        try {
+            await coveyToken.send(accounts[3], '10000000000000000000', []);
+            await coveyToken.authorizeOperator(coveyStaking.address, {
+                from: accounts[3],
+            });
+            const tx = await coveyStaking.stake('20000000000000000000', {
+                from: accounts[3],
+            });
+        } catch (e) {
+            err = e;
+        }
+
+        assert.ok(err instanceof Error);
     });
 
     it('allows users to view staked amounts', async () => {
@@ -81,14 +109,46 @@ contract('CoveyStaking', async (accounts) => {
                 from: accounts[5],
             });
 
-            await coveyStaking.unstake('1000000000000000000', {
+            const tx = await coveyStaking.unstake('1000000000000000000', {
                 from: accounts[5],
+            });
+
+            truffleAssert.eventEmitted(tx, 'Unstaked', (ev) => {
+                return (
+                    ev._adr === accounts[5] &&
+                    parseInt(ev.amount) === 1000000000000000000
+                );
             });
         } catch (e) {
             err = e;
         }
 
         assert.equal(err, null);
+    });
+
+    it('does not allow users to unstake more than they have staked', async () => {
+        const coveyToken = await CoveyToken.deployed();
+        const coveyStaking = await CoveyStaking.deployed();
+
+        let err = null;
+
+        try {
+            await coveyToken.send(accounts[2], '10000000000000000000', []);
+            await coveyToken.authorizeOperator(coveyStaking.address, {
+                from: accounts[2],
+            });
+            await coveyStaking.stake('2000000000000000000', {
+                from: accounts[2],
+            });
+
+            await coveyStaking.unstake('8000000000000000000', {
+                from: accounts[2],
+            });
+        } catch (e) {
+            err = e;
+        }
+
+        assert.ok(err instanceof Error);
     });
 
     it('allows users to view unstaked amounts', async () => {
