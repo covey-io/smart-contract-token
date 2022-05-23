@@ -19,7 +19,6 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
 
   mapping(address => uint) private _unstakedAmounts;
 
-
   address[] public stakers;
 
   IERC1820Registry public registry;
@@ -89,7 +88,10 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
     }
 
   function stake(uint amount) public {
-      stakingToken.send(address(this), amount, "Covey Stake");
+      require(msg.sender != address(0), "Sender is 0 address");
+      require(stakingToken.isOperatorFor(address(this), msg.sender), "Staking contract is not an operator for this address");
+
+      stakingToken.operatorSend(msg.sender, address(this), amount, "Covey Stake", "");
       _stakedAmounts[msg.sender] = _stakedAmounts[msg.sender] + amount;
       stakers.push(msg.sender);
       emit Staked(msg.sender, amount);
@@ -116,29 +118,29 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
       return _unstakedAmounts[msg.sender];
   }
 
-  function dispenseStakes(address[] memory bankruptAddresses) public onlyOwner {
+  function dispenseStakes(address[] calldata bankruptAddresses) public onlyOwner {
       for(uint i = 0; i < stakers.length; i++) {
           bool isBankrupt = false;
           for(uint j = 0; j < bankruptAddresses.length; j++) {
-              if(bankruptAddresses[j] == stakers[i]) {
-                  isBankrupt = true;
-              }
-          }
+                if(bankruptAddresses[j] == stakers[i]) {
+                    isBankrupt = true;
+                }
+            }
 
-          if(isBankrupt) {
+          if(isBankrupt == true) {
+              emit Bankrupt(stakers[i], _stakedAmounts[stakers[i]]);
               delete _unstakedAmounts[stakers[i]];
               delete _stakedAmounts[stakers[i]];
               delete stakers[i]; 
-              emit Bankrupt(stakers[i], _stakedAmounts[msg.sender]);
-          } else if( _unstakedAmounts[stakers[i]] > 0) {
+          } else if( _unstakedAmounts[stakers[i]] > 0 && isBankrupt == false) {
               stakingToken.send(stakers[i], _unstakedAmounts[stakers[i]], "Stake dispensal");
+              emit StakeDispensed(stakers[i], _unstakedAmounts[stakers[i]]);
               _stakedAmounts[stakers[i]] = _stakedAmounts[stakers[i]] - _unstakedAmounts[stakers[i]];
               _unstakedAmounts[stakers[i]] = 0;
 
               if(_stakedAmounts[stakers[i]] <= 0) {
                   delete stakers[i];
               }
-              emit StakeDispensed(stakers[i], _unstakedAmounts[stakers[i]]);
           }
       }
   }
