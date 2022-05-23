@@ -9,30 +9,6 @@ contract('CoveyStaking', async (accounts) => {
         assert(coveyStaking.address);
     });
 
-    it('receives CVY tokens', async () => {
-        const coveyToken = await CoveyToken.deployed();
-        const coveyStaking = await CoveyStaking.deployed();
-        let err = null;
-
-        try {
-            await coveyToken.send(
-                coveyStaking.address,
-                '10000000000000000000',
-                []
-            );
-        } catch (e) {
-            err = e;
-        }
-
-        assert.equal(err, null);
-
-        const coveyStakingBalance = await coveyToken.balanceOf(
-            coveyStaking.address
-        );
-
-        assert.isAbove(parseInt(coveyStakingBalance), 9000000000000000000);
-    });
-
     it('allows users to stake', async () => {
         const coveyToken = await CoveyToken.deployed();
         const coveyStaking = await CoveyStaking.deployed();
@@ -220,7 +196,28 @@ contract('CoveyStaking', async (accounts) => {
                 from: accounts[7],
             });
 
-            await coveyStaking.dispenseStakes([]);
+            const tx = await coveyStaking.dispenseStakes([]);
+
+            truffleAssert.eventEmitted(tx, 'StakeDispensed', (ev) => {
+                return (
+                    ev._adr === accounts[5] &&
+                    parseInt(ev.amountDispensed) === 1000000000000000000
+                );
+            });
+
+            truffleAssert.eventEmitted(tx, 'StakeDispensed', (ev) => {
+                return (
+                    ev._adr === accounts[6] &&
+                    parseInt(ev.amountDispensed) === 1000000000000000000
+                );
+            });
+
+            truffleAssert.eventEmitted(tx, 'StakeDispensed', (ev) => {
+                return (
+                    ev._adr === accounts[7] &&
+                    parseInt(ev.amountDispensed) === 1000000000000000000
+                );
+            });
         } catch (e) {
             err = e;
         }
