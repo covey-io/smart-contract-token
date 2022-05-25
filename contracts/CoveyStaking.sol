@@ -99,7 +99,7 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
       _stakedAmounts[msg.sender] +=  amount;
       stakers.push(msg.sender);
       emit Staked(msg.sender, amount);
-      emit TotalStaked(msg.sender, _stakedAmounts[msg.sender] + amount);
+      emit TotalStaked(msg.sender, _stakedAmounts[msg.sender]);
   }
 
   function unstake(uint amount) public {
@@ -107,7 +107,7 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
       require(_stakedAmounts[msg.sender] - (_unstakedAmounts[msg.sender] + amount) >= 0, "Cannot unstake more than total staked amount");
       _unstakedAmounts[msg.sender] += amount;
       emit Unstaked(msg.sender, amount);
-      emit TotalUnstaked(msg.sender, _unstakedAmounts[msg.sender] + amount);
+      emit TotalUnstaked(msg.sender, _unstakedAmounts[msg.sender]);
   }
 
   function cancelUnstake() public {
