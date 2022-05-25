@@ -91,7 +91,7 @@ contract('CoveyStaking', async (accounts) => {
         const stakedAmount = await coveyStaking.getTotalStaked({
             from: accounts[5],
         });
-        assert.isAtLeast(parseInt(stakedAmount), 2000000000000000000);
+        assert.equal(parseInt(stakedAmount), 2000000000000000000);
     });
 
     it('allows users to unstake', async () => {

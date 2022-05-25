@@ -36,6 +36,10 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
   
   event Unstaked(address indexed _adr, uint amount);
 
+  event TotalStaked(address indexed _adr, uint amount);
+  
+  event TotalUnstaked(address indexed _adr, uint amount);
+
   event CancelledUnstake(address indexed _adr);
 
   event Bankrupt(address indexed _adr, uint amountLost);
@@ -92,16 +96,18 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
       require(stakingToken.isOperatorFor(address(this), msg.sender), "Staking contract is not an operator for this address");
 
       stakingToken.operatorSend(msg.sender, address(this), amount, "Covey Stake", "");
-      _stakedAmounts[msg.sender] = _stakedAmounts[msg.sender] + amount;
+      _stakedAmounts[msg.sender] +=  amount;
       stakers.push(msg.sender);
       emit Staked(msg.sender, amount);
+      emit TotalStaked(msg.sender, _stakedAmounts[msg.sender] + amount);
   }
 
   function unstake(uint amount) public {
       require(_stakedAmounts[msg.sender] != 0, "Has not staked");
-      require(_stakedAmounts[msg.sender] - amount >= 0, "Cannot unstake more than total staked amount");
-      _unstakedAmounts[msg.sender] = _unstakedAmounts[msg.sender] + amount;
+      require(_stakedAmounts[msg.sender] - (_unstakedAmounts[msg.sender] + amount) >= 0, "Cannot unstake more than total staked amount");
+      _unstakedAmounts[msg.sender] += amount;
       emit Unstaked(msg.sender, amount);
+      emit TotalUnstaked(msg.sender, _unstakedAmounts[msg.sender] + amount);
   }
 
   function cancelUnstake() public {
