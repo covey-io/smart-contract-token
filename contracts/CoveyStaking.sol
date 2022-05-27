@@ -116,12 +116,12 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
       emit CancelledUnstake(msg.sender);
   }
 
-  function getTotalStaked() public view returns(uint) {
-      return _stakedAmounts[msg.sender];
+  function getTotalStaked(address _adr) public view returns(uint) {
+      return _stakedAmounts[_adr];
   }
 
-  function getTotalUnstaked() public view returns(uint) {
-      return _unstakedAmounts[msg.sender];
+  function getTotalUnstaked(address _adr) public view returns(uint) {
+      return _unstakedAmounts[_adr];
   }
 
   function dispenseStakes(address[] calldata bankruptAddresses) public onlyOwner {

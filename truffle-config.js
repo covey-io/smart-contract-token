@@ -91,6 +91,16 @@ module.exports = {
             gas: 20000000,
             gasPrice: 10000000000,
         },
+        goerli: {
+            provider: () =>
+                new HDWalletProvider(
+                    process.env.PRIVATE_KEY,
+                    'https://goerli.infura.io/v3/' + process.env.INFURA_KEY
+                ),
+            network_id: 5,
+            gas: 6000000,
+            gasPrice: 40000000000,
+        },
         matic: {
             provider: () =>
                 new HDWalletProvider(
@@ -124,6 +134,12 @@ module.exports = {
             //  evmVersion: "byzantium"
             // }
         },
+    },
+
+    plugins: ['truffle-plugin-verify'],
+    api_keys: {
+        etherscan: process.env.ETHERSCAN_API_KEY,
+        polygonscan: process.env.POLYGONSCAN_API_KEY,
     },
 
     // Truffle DB is currently disabled by default; to enable it, change enabled:
