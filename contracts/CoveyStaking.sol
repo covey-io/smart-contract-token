@@ -12,6 +12,11 @@ import "@openzeppelin/contracts/utils/introspection/ERC1820Implementer.sol";
 contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820Implementer  {
   IERC777 public stakingToken;
 
+  struct StakeInfo {
+      address staker;
+      uint stakedAmount;
+  }
+
   address owner;
 
 
@@ -151,5 +156,22 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
       }
   }
 
+  function getNetStaked(address staker) public view returns (uint) {
+      require(staker != address(0), "Sender is 0 address");
+      
+      return _stakedAmounts[staker] - _unstakedAmounts[staker];
+  }
 
+  function getAllNetStaked() public view returns (StakeInfo[] memory) {
+      StakeInfo[] memory stakeInformation;
+
+      for(uint i = 0; i < stakers.length; i++) {
+          stakeInformation[i] = StakeInfo({
+              staker: stakers[i],
+              stakedAmount: getNetStaked(stakers[i])
+          });
+      }
+
+      return stakeInformation;
+  }
 }

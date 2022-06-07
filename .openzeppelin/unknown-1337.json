@@ -1,8 +1,8 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0xb4fB643644F3A6614c63D00Ab77b72af5E8eD22A",
-    "txHash": "0x6568162fbd71da77da67b81d9e9aeff328dc6902cf13aef29a8e2086d950b96a"
+    "address": "0x5ec3194835DC78C0A0ca41c6c15009141F3448ed",
+    "txHash": "0x548c32ec5f6de2f7fe191dc2c134c0731f5d275f719c2e50c4b0b10ac92274de"
   },
   "proxies": [
     {
@@ -423,6 +423,11 @@
     {
       "address": "0xFe36839E57a42914D7F13701e3DCb931bD1441dD",
       "txHash": "0x0d5970f2c4d8efc769e55c4e0c22277ff00b114e3df1d453afa66e762035cb9a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x52dE7b06CAC756a3355122fB2DDa5bf9B5d4Fa61",
+      "txHash": "0x74a732debab4ff9988471fba0a02681f2c47bc2278a124fd47934227e83aa1cd",
       "kind": "transparent"
     }
   ],
@@ -2947,6 +2952,104 @@
             "label": "registry",
             "type": "t_contract(IERC1820Registry)2412",
             "src": "..\\project:\\contracts\\CoveyStaking.sol:24"
+          }
+        ],
+        "types": {
+          "t_contract(IERC777)1892": {
+            "label": "contract IERC777"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_contract(IERC1820Registry)2412": {
+            "label": "contract IERC1820Registry"
+          },
+          "t_mapping(t_bytes32,t_mapping(t_address,t_bool))": {
+            "label": "mapping(bytes32 => mapping(address => bool))"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          }
+        }
+      }
+    },
+    "3965713b6e83f5873fa49f51228b86f3a02959719bb6216a5a61d3c43a7235c2": {
+      "address": "0xaFfec9f142818013b3B5AA4111e46D719a5BF8b7",
+      "txHash": "0xc768b0c211a0fa496716e2d8ce7babc77ef8ddf5956481abfc9888d2ad7860ff",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "contract": "ERC1820Implementer",
+            "label": "_supportedInterfaces",
+            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_bool))",
+            "src": "../@openzeppelin/contracts/utils/introspection/ERC1820Implementer.sol:19"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakingToken",
+            "type": "t_contract(IERC777)1892",
+            "src": "../project:/contracts/CoveyStaking.sol:13"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "owner",
+            "type": "t_address",
+            "src": "../project:/contracts/CoveyStaking.sol:20"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_stakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/CoveyStaking.sol:23"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_unstakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/CoveyStaking.sol:25"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakers",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "../project:/contracts/CoveyStaking.sol:27"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "registry",
+            "type": "t_contract(IERC1820Registry)2412",
+            "src": "../project:/contracts/CoveyStaking.sol:29"
           }
         ],
         "types": {
