@@ -119,15 +119,14 @@ contract CoveyToken is ERC777, Ownable {
     require(to != address(0), "transfer to the zero address");
 
     uint unlockAt = block.timestamp + timeToLock;
-    uint256 toSend = amount * 10**18;
     TokenLock memory tokenLock = TokenLock({
-      amount: toSend,
+      amount: amount,
       unlockAt: unlockAt,
       reason: reason
     });
-    send(to,toSend, "Locked Tokens");
+    send(to,amount, "Locked Tokens");
     _tokenLocks[to].push(tokenLock);
-    emit Lock(to, toSend, unlockAt, reason);
+    emit Lock(to, amount, unlockAt, reason);
   }
 
   function _unlock(address _adr, uint256 lockIndex) private {
