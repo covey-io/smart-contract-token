@@ -21,7 +21,7 @@ contract CoveyToken is ERC777, Ownable {
 
   mapping(address => TokenLock[]) _tokenLocks; 
 
-  uint _maxSupply = 1000000000000000000000000000;
+  uint _maxSupply = 1000000000000000000000000;
 
   constructor (uint initialSupply, address[] memory defaultOperators) ERC777("Covey", "CVY", defaultOperators) {
     _mint(msg.sender, initialSupply, "", "");
@@ -104,7 +104,7 @@ contract CoveyToken is ERC777, Ownable {
 
   function airdrop(_Airdrop[] memory airdrops) public  {
     for(uint i = 0; i < airdrops.length; i++) {
-      uint256 toSend = airdrops[i].amount * 10**18;
+      uint256 toSend = airdrops[i].amount;
       if(airdrops[i].lockForSeconds != 0) {
         sendLocked(airdrops[i].recipient, airdrops[i].amount, airdrops[i].lockForSeconds, "Locked CVY airdrop");
       } else {

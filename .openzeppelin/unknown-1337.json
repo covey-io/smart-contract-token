@@ -1,8 +1,8 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0x5ec3194835DC78C0A0ca41c6c15009141F3448ed",
-    "txHash": "0x548c32ec5f6de2f7fe191dc2c134c0731f5d275f719c2e50c4b0b10ac92274de"
+    "address": "0x6857AF327A1447308437b9E1faC04627a099951F",
+    "txHash": "0xf13b199d535f9d6b2bcff3ae80a8d7b4fbe3f02328c9ebfb3486e881f64bfc3d"
   },
   "proxies": [
     {
@@ -428,6 +428,16 @@
     {
       "address": "0x52dE7b06CAC756a3355122fB2DDa5bf9B5d4Fa61",
       "txHash": "0x74a732debab4ff9988471fba0a02681f2c47bc2278a124fd47934227e83aa1cd",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xf481F1c02CB44e032027305Cc51FD8Cee9158B0a",
+      "txHash": "0x5fbada29f87d314c568406e0b5a50eccc315e9e2a4b57f91aee48500d17d5a4f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc9fDa8678A333F81F598848ed870aad8F04F0F57",
+      "txHash": "0x29dabccb956f650879e72a405b9d4a195322482d5ea053da8df86a0f32037db4",
       "kind": "transparent"
     }
   ],
@@ -2992,64 +3002,64 @@
       }
     },
     "3965713b6e83f5873fa49f51228b86f3a02959719bb6216a5a61d3c43a7235c2": {
-      "address": "0xaFfec9f142818013b3B5AA4111e46D719a5BF8b7",
-      "txHash": "0xc768b0c211a0fa496716e2d8ce7babc77ef8ddf5956481abfc9888d2ad7860ff",
+      "address": "0x0264fa0A503b82A28705E6b1Bbe6249AD8CE428F",
+      "txHash": "0x2c634c137c0fbaf333799bfe2e1de7396cc521b3ab13d5e1e33ee8e2a2967f79",
       "layout": {
         "storage": [
           {
             "contract": "Initializable",
             "label": "_initialized",
             "type": "t_uint8",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
             "retypedFrom": "bool"
           },
           {
             "contract": "Initializable",
             "label": "_initializing",
             "type": "t_bool",
-            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
           },
           {
             "contract": "ERC1820Implementer",
             "label": "_supportedInterfaces",
             "type": "t_mapping(t_bytes32,t_mapping(t_address,t_bool))",
-            "src": "../@openzeppelin/contracts/utils/introspection/ERC1820Implementer.sol:19"
+            "src": "..\\@openzeppelin\\contracts\\utils\\introspection\\ERC1820Implementer.sol:19"
           },
           {
             "contract": "CoveyStaking",
             "label": "stakingToken",
             "type": "t_contract(IERC777)1892",
-            "src": "../project:/contracts/CoveyStaking.sol:13"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:13"
           },
           {
             "contract": "CoveyStaking",
             "label": "owner",
             "type": "t_address",
-            "src": "../project:/contracts/CoveyStaking.sol:20"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:20"
           },
           {
             "contract": "CoveyStaking",
             "label": "_stakedAmounts",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "../project:/contracts/CoveyStaking.sol:23"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:23"
           },
           {
             "contract": "CoveyStaking",
             "label": "_unstakedAmounts",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "../project:/contracts/CoveyStaking.sol:25"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:25"
           },
           {
             "contract": "CoveyStaking",
             "label": "stakers",
             "type": "t_array(t_address)dyn_storage",
-            "src": "../project:/contracts/CoveyStaking.sol:27"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:27"
           },
           {
             "contract": "CoveyStaking",
             "label": "registry",
             "type": "t_contract(IERC1820Registry)2412",
-            "src": "../project:/contracts/CoveyStaking.sol:29"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:29"
           }
         ],
         "types": {

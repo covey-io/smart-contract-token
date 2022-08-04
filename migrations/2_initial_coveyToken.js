@@ -15,7 +15,7 @@ module.exports = async function (deployer, network, accounts) {
 
     const instance = await deployer.deploy(
         CoveyToken,
-        '1000000000000000000000000000',
+        '1000000000000000000000000',
         []
     );
 };

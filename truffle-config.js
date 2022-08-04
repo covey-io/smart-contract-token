@@ -75,8 +75,8 @@ module.exports = {
             confirmations: 2,
             timeoutBlocks: 200,
             skipDryRun: true,
-            gas: 6000000,
-            gasPrice: 40000000000,
+            gas: 20000000,
+            gasPrice: 10000000000,
         },
         rinkeby: {
             provider: () =>
@@ -95,8 +95,12 @@ module.exports = {
                     'https://goerli.infura.io/v3/' + process.env.INFURA_KEY
                 ),
             network_id: 5,
-            gas: 6000000,
-            gasPrice: 40000000000,
+            confirmations: 1,
+            skipDryRun: true,
+            gas: 20000000,
+            timeoutBlocks: 90000,
+            networkCheckTimeout: 12000000,
+            gasPrice: 13000000000,
         },
         matic: {
             provider: () =>
