@@ -9,6 +9,11 @@
       "address": "0x3b4fe727D238b1739d02F8a41e14fFc7a1f783a5",
       "txHash": "0xfc101706baa592c26a6ce1ba2b2566eca635b62064193558ea5518516411849f",
       "kind": "transparent"
+    },
+    {
+      "address": "0xFe36839E57a42914D7F13701e3DCb931bD1441dD",
+      "txHash": "0x825c1e84dfbbf84d3c600cd0cea5f4905db0d1f67fe7880a28c18f8e6d55afce",
+      "kind": "transparent"
     }
   ],
   "impls": {
