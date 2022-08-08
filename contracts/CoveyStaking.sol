@@ -1,16 +1,16 @@
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC777/IERC777.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-import "@openzeppelin/contracts/token/ERC777/IERC777Sender.sol";
-import "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
-import "@openzeppelin/contracts/interfaces/IERC1820Registry.sol";
-import "@openzeppelin/contracts/utils/introspection/ERC1820Implementer.sol";
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820Implementer  {
-  IERC777 public stakingToken;
+
+contract CoveyStaking is Initializable {
+  using SafeERC20 for IERC20;
+  using SafeMath for uint256;
+  IERC20 public stakingToken;
 
   struct StakeInfo {
       address staker;
@@ -25,17 +25,6 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
   mapping(address => uint) private _unstakedAmounts;
 
   address[] public stakers;
-
-  IERC1820Registry public registry;
-    
-    // keccak256('ERC777TokensRecipient')
-    bytes32 constant private TOKENS_RECIPIENT_INTERFACE_HASH
-        = 0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
-
-
-   // keccak256("ERC777TokensSender")
-    bytes32 constant private TOKENS_SENDER_INTERFACE_HASH =
-        0x29ddb589b1fb5fc7cf394961c1adf5f8c6454761adf795e67fe149f658abe895;
 
   event Staked(address indexed _adr, uint amount);
   
@@ -56,51 +45,18 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
       _;
   }
 
-  function initialize(IERC777 _stakingToken) public initializer {
+  function initialize(IERC20 _stakingToken) public initializer {
         owner = msg.sender;
         stakingToken = _stakingToken;
-
-        registry = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
-
-        registry.setInterfaceImplementer(
-            address(this),
-            TOKENS_RECIPIENT_INTERFACE_HASH,
-            address(this)
-        );
     }
 
-   function tokensReceived(
-        address operator,
-        address from,
-        address to,
-        uint256 amount,
-        bytes calldata userData,
-        bytes calldata operatorData
-    ) external {
-
-    }
-
-    function tokensToSend(
-        address operator,
-        address from,
-        address to,
-        uint256 amount,
-        bytes calldata userData,
-        bytes calldata operatorData
-    ) external {}
-
-    function registerHookForAccount(address account) public {
-        _registerInterfaceForAddress(
-            TOKENS_SENDER_INTERFACE_HASH,
-            account
-        );
-    }
+   
 
   function stake(uint amount) public {
       require(msg.sender != address(0), "Sender is 0 address");
-      require(stakingToken.isOperatorFor(address(this), msg.sender), "Staking contract is not an operator for this address");
+      require(amount <= stakingToken.balanceOf(msg.sender), "Amount exceeds available CVY balance");
 
-      stakingToken.operatorSend(msg.sender, address(this), amount, "Covey Stake", "");
+      stakingToken.safeTransferFrom(msg.sender, address(this), amount);
       _stakedAmounts[msg.sender] +=  amount;
       stakers.push(msg.sender);
       emit Staked(msg.sender, amount);
@@ -144,7 +100,7 @@ contract CoveyStaking is Initializable, IERC777Recipient, IERC777Sender, ERC1820
               delete _stakedAmounts[stakers[i]];
               delete stakers[i]; 
           } else if( _unstakedAmounts[stakers[i]] > 0 && isBankrupt == false) {
-              stakingToken.send(stakers[i], _unstakedAmounts[stakers[i]], "Stake dispensal");
+              stakingToken.transfer(stakers[i], _unstakedAmounts[stakers[i]]);
               emit StakeDispensed(stakers[i], _unstakedAmounts[stakers[i]]);
               _stakedAmounts[stakers[i]] = _stakedAmounts[stakers[i]] - _unstakedAmounts[stakers[i]];
               _unstakedAmounts[stakers[i]] = 0;
