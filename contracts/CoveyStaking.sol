@@ -52,7 +52,7 @@ contract CoveyStaking is Initializable {
       require(msg.sender != address(0), "Sender is 0 address");
       require(amount <= stakingToken.balanceOf(msg.sender), "Amount exceeds available CVY balance");
 
-      stakingToken.transferFrom(msg.sender, address(this), amount);
+      stakingToken.transfer(address(this), amount);
       _stakedAmounts[msg.sender] +=  amount;
       stakers.push(msg.sender);
       emit Staked(msg.sender, amount);
@@ -96,7 +96,7 @@ contract CoveyStaking is Initializable {
               delete _stakedAmounts[stakers[i]];
               delete stakers[i]; 
           } else if( _unstakedAmounts[stakers[i]] > 0 && isBankrupt == false) {
-              stakingToken.transfer(stakers[i], _unstakedAmounts[stakers[i]]);
+              stakingToken.transferFrom(address(this), stakers[i], _unstakedAmounts[stakers[i]]);
               emit StakeDispensed(stakers[i], _unstakedAmounts[stakers[i]]);
               _stakedAmounts[stakers[i]] = _stakedAmounts[stakers[i]] - _unstakedAmounts[stakers[i]];
               _unstakedAmounts[stakers[i]] = 0;

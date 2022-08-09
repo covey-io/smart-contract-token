@@ -193,6 +193,80 @@
           }
         }
       }
+    },
+    "e3fe0501421f3bbb72fdc4e118e398aecefedb80a64b0a3981daf3712577dcba": {
+      "address": "0x7566C479Fc46a5190e066A5F34b5eeC766960Af2",
+      "txHash": "0xd0739a8ffa843890ac090c9d05a14945ffb35c185f756283a66b267bed147e67",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakingToken",
+            "type": "t_contract(IERC20)1155",
+            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:11"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "owner",
+            "type": "t_address",
+            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:15"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_stakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:16"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_unstakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:16"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakers",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:18"
+          }
+        ],
+        "types": {
+          "t_contract(IERC20)1155": {
+            "label": "contract IERC20"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
     }
   }
 }
