@@ -1,6 +1,6 @@
 // contracts/CoveyStaking.sol
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
@@ -47,13 +47,14 @@ contract CoveyStaking is Initializable, AccessControl {
   }
 
   modifier onlyOwnerOrDispenser {
-    require(msg.sender == owner || hasRole(STAKE_DISPENSER, msg.sender));
+    require(msg.sender == owner || hasRole(STAKE_DISPENSER, msg.sender), "Requires owner or dispenser to call");
     _;
   }
 
   function initialize(IERC20 _stakingToken) public initializer {
         owner = msg.sender;
         stakingToken = _stakingToken;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
    
@@ -62,7 +63,7 @@ contract CoveyStaking is Initializable, AccessControl {
       require(msg.sender != address(0), "Sender is 0 address");
       require(amount <= stakingToken.balanceOf(msg.sender), "Amount exceeds available CVY balance");
 
-      stakingToken.transfer(address(this), amount);
+      stakingToken.transferFrom(msg.sender, address(this), amount);
       _stakedAmounts[msg.sender] +=  amount;
       stakers.push(msg.sender);
       emit Staked(msg.sender, amount);
@@ -136,5 +137,13 @@ contract CoveyStaking is Initializable, AccessControl {
       }
 
       return stakeInformation;
+  }
+
+  function delegateDispenser(address _addr) public onlyOwner {
+    grantRole(STAKE_DISPENSER, _addr);
+  }
+
+  function revokeDispenser(address _addr) public onlyOwner {
+    revokeRole(STAKE_DISPENSER, _addr);
   }
 }
