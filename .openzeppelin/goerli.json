@@ -1,30 +1,20 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0xd9D45D393f750384658713331DaD4aCB329381F4",
-    "txHash": "0x66529afbbf8430ba8544bcaa75c619761f5a401df9e71cd54fd5573eaa305bd0"
+    "address": "0x22bDdb246Ee6771C038033f935F1a12CefA8f855",
+    "txHash": "0x8a98d8559bae6661dd32008074c861098adba904b18ae5780a4b3c39bc5a045f"
   },
   "proxies": [
     {
-      "address": "0x3b4fe727D238b1739d02F8a41e14fFc7a1f783a5",
-      "txHash": "0xfc101706baa592c26a6ce1ba2b2566eca635b62064193558ea5518516411849f",
-      "kind": "transparent"
-    },
-    {
-      "address": "0xFe36839E57a42914D7F13701e3DCb931bD1441dD",
-      "txHash": "0x825c1e84dfbbf84d3c600cd0cea5f4905db0d1f67fe7880a28c18f8e6d55afce",
-      "kind": "transparent"
-    },
-    {
-      "address": "0xaEbA58Ab5B0eEae6e14fd945f5e2F0aF997Fe3b2",
-      "txHash": "0x5ad4451f0a25fc97ed50084d7ead23eee2cbcc1c603c3732b3145d42a6ce32c1",
+      "address": "0x0C80e91f15B6BFA87019713b9633f6FA61ef1D14",
+      "txHash": "0xc90457a4b6b7d4aee8c20ba2105205245011ec9c18c8e21f6045a3d4fdbf8230",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "3965713b6e83f5873fa49f51228b86f3a02959719bb6216a5a61d3c43a7235c2": {
-      "address": "0x3BbF43E2F77Ca5144953E98Ae2117D9B5C22a077",
-      "txHash": "0xc13f4f1eb74b2197f9ed03878d5b0ec4b82371b9e4cbaa3aa844aa622de13490",
+    "2121b93d8804164cf23a5a625a0968e4bc05f3cf3862f949023e7231da30c390": {
+      "address": "0x648DE344779D8df65DD13c676C3d28238193a810",
+      "txHash": "0xb6f2b843d822061ad81f78d9ab7198d9d614c0e5fa92ba3b92f5d6c177059e99",
       "layout": {
         "storage": [
           {
@@ -41,51 +31,45 @@
             "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
           },
           {
-            "contract": "ERC1820Implementer",
-            "label": "_supportedInterfaces",
-            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_bool))",
-            "src": "..\\@openzeppelin\\contracts\\utils\\introspection\\ERC1820Implementer.sol:19"
+            "contract": "AccessControl",
+            "label": "_roles",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)404_storage)",
+            "src": "..\\@openzeppelin\\contracts\\access\\AccessControl.sol:55"
           },
           {
             "contract": "CoveyStaking",
             "label": "stakingToken",
-            "type": "t_contract(IERC777)1892",
-            "src": "..\\project:\\contracts\\CoveyStaking.sol:13"
+            "type": "t_contract(IERC20)1537",
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:12"
           },
           {
             "contract": "CoveyStaking",
             "label": "owner",
             "type": "t_address",
-            "src": "..\\project:\\contracts\\CoveyStaking.sol:20"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:19"
           },
           {
             "contract": "CoveyStaking",
             "label": "_stakedAmounts",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "..\\project:\\contracts\\CoveyStaking.sol:23"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:22"
           },
           {
             "contract": "CoveyStaking",
             "label": "_unstakedAmounts",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "..\\project:\\contracts\\CoveyStaking.sol:25"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:24"
           },
           {
             "contract": "CoveyStaking",
             "label": "stakers",
             "type": "t_array(t_address)dyn_storage",
-            "src": "..\\project:\\contracts\\CoveyStaking.sol:27"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "registry",
-            "type": "t_contract(IERC1820Registry)2412",
-            "src": "..\\project:\\contracts\\CoveyStaking.sol:29"
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:26"
           }
         ],
         "types": {
-          "t_contract(IERC777)1892": {
-            "label": "contract IERC777"
+          "t_contract(IERC20)1537": {
+            "label": "contract IERC20"
           },
           "t_address": {
             "label": "address"
@@ -99,14 +83,24 @@
           "t_array(t_address)dyn_storage": {
             "label": "address[]"
           },
-          "t_contract(IERC1820Registry)2412": {
-            "label": "contract IERC1820Registry"
-          },
-          "t_mapping(t_bytes32,t_mapping(t_address,t_bool))": {
-            "label": "mapping(bytes32 => mapping(address => bool))"
+          "t_mapping(t_bytes32,t_struct(RoleData)404_storage)": {
+            "label": "mapping(bytes32 => struct AccessControl.RoleData)"
           },
           "t_bytes32": {
             "label": "bytes32"
+          },
+          "t_struct(RoleData)404_storage": {
+            "label": "struct AccessControl.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32"
+              }
+            ]
           },
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)"
@@ -116,154 +110,6 @@
           },
           "t_uint8": {
             "label": "uint8"
-          }
-        }
-      }
-    },
-    "0acf898e61bbc6d05d6ec7cd01f747f4a2182e445fedae17f0806a182bca689f": {
-      "address": "0x6f0f5C999D25cEb38cb0Fb6c8cca3D65e109Ffb1",
-      "txHash": "0x4c4a6f30926362dc301b45aa456631b8dfc83f4cbb017798be972049cb640d08",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_uint8",
-            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "stakingToken",
-            "type": "t_contract(IERC20)1155",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:11"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "owner",
-            "type": "t_address",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:15"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "_stakedAmounts",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:16"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "_unstakedAmounts",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:16"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "stakers",
-            "type": "t_array(t_address)dyn_storage",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:18"
-          }
-        ],
-        "types": {
-          "t_contract(IERC20)1155": {
-            "label": "contract IERC20"
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_uint8": {
-            "label": "uint8"
-          },
-          "t_bool": {
-            "label": "bool"
-          }
-        }
-      }
-    },
-    "e3fe0501421f3bbb72fdc4e118e398aecefedb80a64b0a3981daf3712577dcba": {
-      "address": "0x7566C479Fc46a5190e066A5F34b5eeC766960Af2",
-      "txHash": "0xd0739a8ffa843890ac090c9d05a14945ffb35c185f756283a66b267bed147e67",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_uint8",
-            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "stakingToken",
-            "type": "t_contract(IERC20)1155",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:11"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "owner",
-            "type": "t_address",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:15"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "_stakedAmounts",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:16"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "_unstakedAmounts",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:16"
-          },
-          {
-            "contract": "CoveyStaking",
-            "label": "stakers",
-            "type": "t_array(t_address)dyn_storage",
-            "src": "..\\@openzeppelin\\contracts\\utils\\Address.sol:18"
-          }
-        ],
-        "types": {
-          "t_contract(IERC20)1155": {
-            "label": "contract IERC20"
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_uint8": {
-            "label": "uint8"
-          },
-          "t_bool": {
-            "label": "bool"
           }
         }
       }

@@ -1,11 +1,14 @@
-pragma solidity ^0.8.9;
+// contracts/CoveyStaking.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.11;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 
-contract CoveyStaking is Initializable {
+contract CoveyStaking is Initializable, AccessControl {
   IERC20 public stakingToken;
 
   struct StakeInfo {
@@ -21,6 +24,8 @@ contract CoveyStaking is Initializable {
   mapping(address => uint) private _unstakedAmounts;
 
   address[] public stakers;
+
+  bytes32 public constant STAKE_DISPENSER = keccak256("STAKE_DISPENSER");
 
   event Staked(address indexed _adr, uint amount);
   
@@ -39,6 +44,11 @@ contract CoveyStaking is Initializable {
   modifier onlyOwner {
       require(msg.sender == owner);
       _;
+  }
+
+  modifier onlyOwnerOrDispenser {
+    require(msg.sender == owner || hasRole(STAKE_DISPENSER, msg.sender));
+    _;
   }
 
   function initialize(IERC20 _stakingToken) public initializer {
@@ -81,7 +91,7 @@ contract CoveyStaking is Initializable {
       return _unstakedAmounts[_adr];
   }
 
-  function dispenseStakes(address[] calldata bankruptAddresses) public onlyOwner {
+  function dispenseStakes(address bankruptciesReceiver, address[] calldata bankruptAddresses) public onlyOwnerOrDispenser {
       for(uint i = 0; i < stakers.length; i++) {
           bool isBankrupt = false;
           for(uint j = 0; j < bankruptAddresses.length; j++) {
@@ -91,12 +101,13 @@ contract CoveyStaking is Initializable {
             }
 
           if(isBankrupt == true) {
+              stakingToken.transfer(bankruptciesReceiver, _stakedAmounts[stakers[i]]);
               emit Bankrupt(stakers[i], _stakedAmounts[stakers[i]]);
               delete _unstakedAmounts[stakers[i]];
               delete _stakedAmounts[stakers[i]];
               delete stakers[i]; 
           } else if( _unstakedAmounts[stakers[i]] > 0 && isBankrupt == false) {
-              stakingToken.transferFrom(address(this), stakers[i], _unstakedAmounts[stakers[i]]);
+              stakingToken.transfer(stakers[i], _unstakedAmounts[stakers[i]]);
               emit StakeDispensed(stakers[i], _unstakedAmounts[stakers[i]]);
               _stakedAmounts[stakers[i]] = _stakedAmounts[stakers[i]] - _unstakedAmounts[stakers[i]];
               _unstakedAmounts[stakers[i]] = 0;
