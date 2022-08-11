@@ -98,8 +98,8 @@ module.exports = {
             confirmations: 1,
             skipDryRun: true,
             gas: 20000000,
-            timeoutBlocks: 90000,
-            networkCheckTimeout: 12000000,
+            timeoutBlocks: 100000,
+            networkCheckTimeout: 20000000,
             gasPrice: 13000000000,
         },
         matic: {

@@ -1,0 +1,118 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x46B097ea2106760D71383fe3248e20B00CA0202C",
+    "txHash": "0x8c4a554355a5fe45e339ef0f6473e80d85decde82c1d8ff1d264a804f48cd27e"
+  },
+  "proxies": [
+    {
+      "address": "0xBAA2D57d8d61f7D42Ee378BceA3080e22B8E313E",
+      "txHash": "0x8bd1eb76aa7d9706a5f87f3a44c085ad39ea2b9bae725f6287c9ffa8eb52dd18",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "402ced0f6bf50232feaaf2a13a57f08c30d85e5bd467ed9aa7c16186a15a35d3": {
+      "address": "0xbE6bD3fa7D9124493AfBA538b841694AacF4ccA1",
+      "txHash": "0xd97f62553302743dbfaf1efc45741799971b884b5d5ffff136a44ae835e39e48",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "..\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
+          },
+          {
+            "contract": "AccessControl",
+            "label": "_roles",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)404_storage)",
+            "src": "..\\@openzeppelin\\contracts\\access\\AccessControl.sol:55"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakingToken",
+            "type": "t_contract(IERC20)1537",
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:12"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "owner",
+            "type": "t_address",
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:19"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_stakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:22"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_unstakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:24"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakers",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "..\\project:\\contracts\\CoveyStaking.sol:26"
+          }
+        ],
+        "types": {
+          "t_contract(IERC20)1537": {
+            "label": "contract IERC20"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)404_storage)": {
+            "label": "mapping(bytes32 => struct AccessControl.RoleData)"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_struct(RoleData)404_storage": {
+            "label": "struct AccessControl.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          }
+        }
+      }
+    }
+  }
+}
