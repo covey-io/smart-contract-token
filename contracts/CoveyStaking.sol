@@ -1,6 +1,6 @@
 // contracts/CoveyStaking.sol
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
@@ -10,36 +10,37 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract CoveyStaking is Initializable, AccessControl {
   IERC20 public stakingToken;
+  bytes32 public constant DISPENSER = keccak256("DISPENSER");
 
   struct StakeInfo {
       address staker;
-      uint stakedAmount;
+      uint256 stakedAmount;
   }
 
   address owner;
 
 
-  mapping(address => uint) private _stakedAmounts;
+  mapping(address => uint256) private _stakedAmounts;
 
-  mapping(address => uint) private _unstakedAmounts;
+  mapping(address => uint256) private _unstakedAmounts;
 
   address[] public stakers;
 
-  bytes32 public constant STAKE_DISPENSER = keccak256("STAKE_DISPENSER");
-
-  event Staked(address indexed _adr, uint amount);
   
-  event Unstaked(address indexed _adr, uint amount);
 
-  event TotalStaked(address indexed _adr, uint amount);
+  event Staked(address indexed _adr, uint256 amount);
   
-  event TotalUnstaked(address indexed _adr, uint amount);
+  event Unstaked(address indexed _adr, uint256 amount);
+
+  event TotalStaked(address indexed _adr, uint256 amount);
+  
+  event TotalUnstaked(address indexed _adr, uint256 amount);
 
   event CancelledUnstake(address indexed _adr);
 
-  event Bankrupt(address indexed _adr, uint amountLost);
+  event Bankrupt(address indexed _adr, uint256 amountLost);
 
-  event StakeDispensed(address indexed _adr, uint amountDispensed);
+  event StakeDispensed(address indexed _adr, uint256 amountDispensed);
 
   modifier onlyOwner {
       require(msg.sender == owner);
@@ -47,7 +48,7 @@ contract CoveyStaking is Initializable, AccessControl {
   }
 
   modifier onlyOwnerOrDispenser {
-    require(msg.sender == owner || hasRole(STAKE_DISPENSER, msg.sender), "Requires owner or dispenser to call");
+    require(msg.sender == owner || hasRole(DISPENSER, msg.sender), "Requires owner or dispenser to call");
     _;
   }
 
@@ -59,7 +60,7 @@ contract CoveyStaking is Initializable, AccessControl {
 
    
 
-  function stake(uint amount) public {
+  function stake(uint256 amount) public {
       require(msg.sender != address(0), "Sender is 0 address");
       require(amount <= stakingToken.balanceOf(msg.sender), "Amount exceeds available CVY balance");
 
@@ -70,7 +71,7 @@ contract CoveyStaking is Initializable, AccessControl {
       emit TotalStaked(msg.sender, _stakedAmounts[msg.sender]);
   }
 
-  function unstake(uint amount) public {
+  function unstake(uint256 amount) public {
       require(_stakedAmounts[msg.sender] != 0, "Has not staked");
       require(_stakedAmounts[msg.sender] - (_unstakedAmounts[msg.sender] + amount) >= 0, "Cannot unstake more than total staked amount");
       _unstakedAmounts[msg.sender] += amount;
@@ -84,18 +85,18 @@ contract CoveyStaking is Initializable, AccessControl {
       emit CancelledUnstake(msg.sender);
   }
 
-  function getTotalStaked(address _adr) public view returns(uint) {
+  function getTotalStaked(address _adr) public view returns(uint256) {
       return _stakedAmounts[_adr];
   }
 
-  function getTotalUnstaked(address _adr) public view returns(uint) {
+  function getTotalUnstaked(address _adr) public view returns(uint256) {
       return _unstakedAmounts[_adr];
   }
 
   function dispenseStakes(address bankruptciesReceiver, address[] calldata bankruptAddresses) public onlyOwnerOrDispenser {
-      for(uint i = 0; i < stakers.length; i++) {
+      for(uint256 i = 0; i < stakers.length; i++) {
           bool isBankrupt = false;
-          for(uint j = 0; j < bankruptAddresses.length; j++) {
+          for(uint256 j = 0; j < bankruptAddresses.length; j++) {
                 if(bankruptAddresses[j] == stakers[i]) {
                     isBankrupt = true;
                 }
@@ -129,7 +130,7 @@ contract CoveyStaking is Initializable, AccessControl {
   function getAllNetStaked() public view returns (StakeInfo[] memory) {
       StakeInfo[] memory stakeInformation;
 
-      for(uint i = 0; i < stakers.length; i++) {
+      for(uint256 i = 0; i < stakers.length; i++) {
           stakeInformation[i] = StakeInfo({
               staker: stakers[i],
               stakedAmount: getNetStaked(stakers[i])
@@ -140,10 +141,10 @@ contract CoveyStaking is Initializable, AccessControl {
   }
 
   function delegateDispenser(address _addr) public onlyOwner {
-    grantRole(STAKE_DISPENSER, _addr);
+    grantRole(DISPENSER, _addr);
   }
 
   function revokeDispenser(address _addr) public onlyOwner {
-    revokeRole(STAKE_DISPENSER, _addr);
+    revokeRole(DISPENSER, _addr);
   }
 }
