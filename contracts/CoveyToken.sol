@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract CoveyToken is ERC20, Ownable {
   uint256 public constant _maxSupply = 1_000_000 * 1e18;
 
-  constructor(uint initialSupply) ERC20("Covey", "CVY")  {}
+  constructor() ERC20("Covey", "CVY")  {}
 
   function mint(
     address account,
