@@ -3279,7 +3279,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.8",
-  "updatedAt": "2022-08-25T15:09:05.104Z",
+  "updatedAt": "2022-09-19T14:00:16.185Z",
   "devdoc": {
     "details": "Collection of functions related to the address type",
     "kind": "dev",
