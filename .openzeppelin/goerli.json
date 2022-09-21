@@ -14,12 +14,119 @@
       "address": "0xC21E6b449DBa027b39D7E87838A508cCc07aF266",
       "txHash": "0xea288a87a9820bc53ab59227e20f1d226946c444dbc82c94dcef2413897936fa",
       "kind": "transparent"
+    },
+    {
+      "address": "0x6B651A395651359AE617A5a725223ED216eaFCbD",
+      "txHash": "0x19f159b453a608ea0b7d2cdabaf989dbff66761aedca29849a9943d13790e5c3",
+      "kind": "transparent"
     }
   ],
   "impls": {
     "50d07679e35145bd59dac633ef8021b412350b471a2c39a27d3e728063a80d22": {
       "address": "0xc32E39A0f1B3Fa5ED3798F3FD1D5D012b7c49d28",
       "txHash": "0x42573cad4a3ff787a8b5b3a5273bbdb888995bbcc818172533964da0d263d416",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "../@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "contract": "AccessControl",
+            "label": "_roles",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)404_storage)",
+            "src": "../@openzeppelin/contracts/access/AccessControl.sol:55"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakingToken",
+            "type": "t_contract(IERC20)1537",
+            "src": "../project:/contracts/CoveyStaking.sol:13"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "owner",
+            "type": "t_address",
+            "src": "../project:/contracts/CoveyStaking.sol:18"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_stakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/CoveyStaking.sol:21"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "_unstakedAmounts",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "../project:/contracts/CoveyStaking.sol:23"
+          },
+          {
+            "contract": "CoveyStaking",
+            "label": "stakers",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "../project:/contracts/CoveyStaking.sol:25"
+          }
+        ],
+        "types": {
+          "t_contract(IERC20)1537": {
+            "label": "contract IERC20"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)404_storage)": {
+            "label": "mapping(bytes32 => struct AccessControl.RoleData)"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_struct(RoleData)404_storage": {
+            "label": "struct AccessControl.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          }
+        }
+      }
+    },
+    "f6de56a22922bebd2b12efbc5fdf3fade4d8006d951d4811db458d8c36a8e833": {
+      "address": "0x46b544F8c54aaf0124b26A3061ed81B2e826D76a",
+      "txHash": "0xf7bb432d6b035d5e355dc834b14027120266c9056c6559b54dbeea357deaa289",
       "layout": {
         "storage": [
           {
