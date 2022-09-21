@@ -12,7 +12,7 @@ contract CoveyToken is ERC20, Ownable {
 
   function mint(
     address account,
-    uint256 amount) public onlyOwner {
+    uint256 amount) external onlyOwner {
       require(totalSupply() + amount <= _maxSupply, "Token Minting cannot exceed Max Supply");
       _mint(account, amount);
   }
