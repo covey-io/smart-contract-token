@@ -12,10 +12,6 @@ contract CoveyToken is ERC20, ERC20Burnable, Ownable {
 
   constructor() ERC20("Covey", "CVY")  {}
 
-/** @dev Mints new tokens up to a cap
-    @param account Address to mint to
-    @param amount the amount of tokens to mint in WEI
- */
   function mint(
     address account,
     uint256 amount) external onlyOwner {
