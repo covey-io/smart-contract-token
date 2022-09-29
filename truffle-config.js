@@ -40,6 +40,21 @@ module.exports = {
         // tab if you use this network and you must also set the `host`, `port` and `network_id`
         // options below to some value.
         //
+        mainnet: {
+            provider: () =>
+                new HDWalletProvider(
+                    process.env.PRIVATE_KEY,
+                    'https://mainnet.infura.io/v3/' + process.env.INFURA_KEY
+                ),
+            network_id: 1,
+            confirmations: 1,
+            skipDryRun: true,
+            gas: 20000000,
+            timeoutBlocks: 100000,
+            networkCheckTimeout: 20000000,
+            gasPrice: 13000000000,
+            allowUnlimitedContractSize: true,
+        },
         development: {
             host: '127.0.0.1', // Localhost (default: none)
             port: 7545, // Standard Ethereum port (default: none)
