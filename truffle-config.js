@@ -141,7 +141,7 @@ module.exports = {
     // Configure your compilers
     compilers: {
         solc: {
-            version: "0.8.17", // Fetch exact version from solc-bin (default: truffle's version)
+            version: '0.8.17', // Fetch exact version from solc-bin (default: truffle's version)
             // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
             // settings: {
             //     // See the solidity docs for advice about optimization and evmVersion
@@ -154,7 +154,7 @@ module.exports = {
         },
     },
 
-    plugins: ['truffle-plugin-verify'],
+    plugins: ['truffle-plugin-verify', 'truffle-plugin-stdjsonin'],
     api_keys: {
         etherscan: process.env.ETHERSCAN_API_KEY,
         polygonscan: process.env.POLYGONSCAN_API_KEY,

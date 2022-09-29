@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "truffle-assertions": "^0.9.2",
+    "truffle-plugin-stdjsonin": "github:mhrsalehi/truffle-plugin-stdjsonin",
     "truffle-plugin-verify": "^0.5.25"
   }
 }
