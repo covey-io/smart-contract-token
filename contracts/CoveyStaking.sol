@@ -2,37 +2,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
+contract CoveyStaking is Initializable, AccessControlUpgradeable {
+    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
-contract CoveyStaking is Initializable, AccessControl {
     bytes32 public constant DISPENSER = keccak256("DISPENSER");
     IERC20 public stakingToken;
     struct StakeInfo {
       address staker;
       uint256 stakedAmount;
     }
-    address owner;
+    EnumerableSetUpgradeable.AddressSet internal stakers;
+    address[] public pendingUnstakers;
 
+    mapping(address => uint256) public stakedAmounts;
+    mapping(address => uint256) public unstakedAmounts;
 
-    mapping(address => uint256) private _stakedAmounts;
-
-    mapping(address => uint256) private _unstakedAmounts;
-
-    address[] public stakers;
-
+    event Staked(address indexed _adr, uint256 amount, uint256 totalStakedAmount);
     
-
-    event Staked(address indexed _adr, uint256 amount);
-    
-    event Unstaked(address indexed _adr, uint256 amount);
-
-    event TotalStaked(address indexed _adr, uint256 amount);
-    
-    event TotalUnstaked(address indexed _adr, uint256 amount);
+    event Unstaked(address indexed _adr, uint256 amount, uint256 totalUnstakedAmount);
 
     event CancelledUnstake(address indexed _adr);
 
@@ -41,108 +33,160 @@ contract CoveyStaking is Initializable, AccessControl {
     event StakeDispensed(address indexed _adr, uint256 amountDispensed);
 
     modifier onlyOwner {
-        require(msg.sender == owner);
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Not owner");
         _;
     }
 
     modifier onlyOwnerOrDispenser {
-        require(msg.sender == owner || hasRole(DISPENSER, msg.sender), "Requires owner or dispenser to call");
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
+            hasRole(DISPENSER, msg.sender),
+            "Only owner or dispenser"
+        );
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(IERC20 _stakingToken) public initializer {
-            owner = msg.sender;
-            stakingToken = _stakingToken;
-            _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        }
+        __AccessControl_init();
+        stakingToken = _stakingToken;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
 
-    
-
-    function stake(uint256 amount) public {
-        require(msg.sender != address(0), "Sender is 0 address");
-        require(amount <= stakingToken.balanceOf(msg.sender), "Amount exceeds available CVY balance");
-
+    function stake(uint256 amount) external {
+        require(amount != 0, "0 amount");
         stakingToken.transferFrom(msg.sender, address(this), amount);
-        _stakedAmounts[msg.sender] +=  amount;
-        stakers.push(msg.sender);
-        emit Staked(msg.sender, amount);
-        emit TotalStaked(msg.sender, _stakedAmounts[msg.sender]);
+        // if recognised as first time staker, push to staker list
+        if (!stakers.contains(msg.sender)) stakers.add(msg.sender);
+        uint256 totalStakedAmount = stakedAmounts[msg.sender] + amount;
+        stakedAmounts[msg.sender] = totalStakedAmount;
+        emit Staked(msg.sender, amount, totalStakedAmount);
     }
 
-    function unstake(uint256 amount) public {
-        require(_stakedAmounts[msg.sender] != 0, "Has not staked");
-        require(_stakedAmounts[msg.sender] - (_unstakedAmounts[msg.sender] + amount) >= 0, "Cannot unstake more than total staked amount");
-        _unstakedAmounts[msg.sender] += amount;
-        emit Unstaked(msg.sender, amount);
-        emit TotalUnstaked(msg.sender, _unstakedAmounts[msg.sender]);
+    function unstake(uint256 amount) external {
+        require(amount != 0, "0 amount");
+        uint256 totalUnstakedAmount = unstakedAmounts[msg.sender] + amount;
+        require(stakedAmounts[msg.sender] >= totalUnstakedAmount, "Unstaking too large");
+        // add to pending unstaker list
+        // if user unstaking for first time since dispenseStakes() was called
+        // checking (totalUnstakedAmount == amount) instead of (unstakedAmounts[msg.sender] == 0)
+        // is more gas efficient because it avoids an SLOAD
+        if (totalUnstakedAmount == amount) {
+            pendingUnstakers.push(msg.sender);
+        }
+        unstakedAmounts[msg.sender] = totalUnstakedAmount;
+        emit Unstaked(msg.sender, amount, totalUnstakedAmount);
     }
 
-    function cancelUnstake() public {
-        require(_unstakedAmounts[msg.sender] > 0, "No unstake to cancel");
-        delete _unstakedAmounts[msg.sender];
+    /// @dev iterates through pendingUnstakers, might run out of gas
+    function cancelUnstake() external {
+        require(unstakedAmounts[msg.sender] > 0, "0 unstake");
+        delete unstakedAmounts[msg.sender];
+        uint256 numUnstakers = pendingUnstakers.length;
+        for (uint i; i < numUnstakers; ++i) {
+            if (pendingUnstakers[i] == msg.sender) {
+                pendingUnstakers[i] = pendingUnstakers[numUnstakers - 1];
+                pendingUnstakers.pop();
+                break;
+            }
+        }
         emit CancelledUnstake(msg.sender);
     }
 
-    function getTotalStaked(address _adr) public view returns(uint256) {
-        return _stakedAmounts[_adr];
+    /// @dev more gas efficient by taking in the index to avoid iterating through pendingUnstakers
+    function cancelUnstake(uint256 index) external {
+        require(unstakedAmounts[msg.sender] > 0, "0 unstake");
+        delete unstakedAmounts[msg.sender];
+        require(pendingUnstakers[index] == msg.sender, "Wrong index");
+        pendingUnstakers[index] = pendingUnstakers[pendingUnstakers.length - 1];
+        pendingUnstakers.pop();
+        emit CancelledUnstake(msg.sender);
     }
 
-    function getTotalUnstaked(address _adr) public view returns(uint256) {
-        return _unstakedAmounts[_adr];
+    function dispenseStakes() external onlyOwnerOrDispenser {
+        // iterate through pendingUnstakers list
+        uint256 numUnstakers = pendingUnstakers.length;
+        address unstaker;
+        uint256 unstakeAmount;
+        for(uint256 i; i < numUnstakers; ++i) {
+            unstaker = pendingUnstakers[i];
+            unstakeAmount = unstakedAmounts[unstaker];
+            stakedAmounts[unstaker] = stakedAmounts[unstaker] - unstakeAmount;
+            delete unstakedAmounts[unstaker];
+
+            // remove from staking list if user has 0 stake after unstaking
+            if (stakedAmounts[unstaker] == 0) stakers.remove(unstaker);
+
+            stakingToken.transfer(unstaker, unstakeAmount);
+            emit StakeDispensed(unstaker, unstakeAmount);
+        }
+        // finally, reset pendingUnstakers list
+        delete pendingUnstakers;
     }
 
-    function dispenseStakes(address bankruptciesReceiver, address[] calldata bankruptAddresses) public onlyOwnerOrDispenser {
-        for(uint256 i = 0; i < stakers.length; i++) {
-            bool isBankrupt = false;
-            for(uint256 j = 0; j < bankruptAddresses.length; j++) {
-                    if(bankruptAddresses[j] == stakers[i]) {
-                        isBankrupt = true;
-                    }
-                }
+    /// @param indices array of indices of bankruptAddresses in the pendingUnstaker array
+    /// value will be ignored if bankruptAddress has no pending unstakes
+    /// @dev indices to be of same length as bankruptAddresses
+    function bankruptStakers(
+        address bankruptciesReceiver,
+        address[] calldata bankruptAddresses,
+        uint256[] calldata indices
+    ) external onlyOwner {
+        uint256 bankruptAddressesLength = bankruptAddresses.length;
+        require(bankruptAddressesLength == indices.length, "length mismatch");
+        address bankruptAddress;
+        uint256 stakedAmount;
+        for (uint i = 0; i < bankruptAddressesLength; ++i) {
+            bankruptAddress = bankruptAddresses[i];
+            stakedAmount = stakedAmounts[bankruptAddress];
 
-            if(isBankrupt == true) {
-                stakingToken.transfer(bankruptciesReceiver, _stakedAmounts[stakers[i]]);
-                emit Bankrupt(stakers[i], _stakedAmounts[stakers[i]]);
-                delete _unstakedAmounts[stakers[i]];
-                delete _stakedAmounts[stakers[i]];
-                delete stakers[i]; 
-            } else if( _unstakedAmounts[stakers[i]] > 0 && isBankrupt == false) {
-                stakingToken.transfer(stakers[i], _unstakedAmounts[stakers[i]]);
-                emit StakeDispensed(stakers[i], _unstakedAmounts[stakers[i]]);
-                _stakedAmounts[stakers[i]] = _stakedAmounts[stakers[i]] - _unstakedAmounts[stakers[i]];
-                _unstakedAmounts[stakers[i]] = 0;
-
-                if(_stakedAmounts[stakers[i]] <= 0) {
-                    delete stakers[i];
-                }
+            // remove from pendingUnstaker list if bankruptAddress has a pending unstake
+            // subsequently zeroes unstakedAmounts mapping
+            if (unstakedAmounts[bankruptAddress] > 0) {
+                require(pendingUnstakers[indices[i]] == bankruptAddress, "wrong index");
+                pendingUnstakers[indices[i]] = pendingUnstakers[pendingUnstakers.length - 1];
+                pendingUnstakers.pop();
+                delete unstakedAmounts[bankruptAddress];
             }
+
+            // remove from stakedAmounts mapping
+            delete stakedAmounts[bankruptAddress];
+
+            // remove from stakers list
+            stakers.remove(bankruptAddress);
+
+            // transfer stakedAmount to specified receiver address
+            stakingToken.transfer(bankruptciesReceiver, stakedAmount);
+            emit Bankrupt(bankruptAddress, stakedAmount);
         }
     }
 
     function getNetStaked(address staker) public view returns (uint) {
-        require(staker != address(0), "Sender is 0 address");
-        
-        return _stakedAmounts[staker] - _unstakedAmounts[staker];
+        return stakedAmounts[staker] - unstakedAmounts[staker];
     }
 
-    function getAllNetStaked() public view returns (StakeInfo[] memory) {
-        StakeInfo[] memory stakeInformation;
-
-        for(uint256 i = 0; i < stakers.length; i++) {
+    function getAllNetStaked() external view returns (StakeInfo[] memory stakeInformation) {
+        uint256 numStakers = stakers.length();
+        stakeInformation = new StakeInfo[](numStakers);
+        address staker;
+        for(uint256 i; i < numStakers; ++i) {
+            staker = stakers.at(i);
             stakeInformation[i] = StakeInfo({
-                staker: stakers[i],
-                stakedAmount: getNetStaked(stakers[i])
+                staker: staker,
+                stakedAmount: getNetStaked(staker)
             });
         }
-
-        return stakeInformation;
     }
 
-    function delegateDispenser(address _addr) public onlyOwner {
+    function delegateDispenser(address _addr) external onlyOwner {
         grantRole(DISPENSER, _addr);
     }
 
-    function revokeDispenser(address _addr) public onlyOwner {
+    function revokeDispenser(address _addr) external onlyOwner {
         revokeRole(DISPENSER, _addr);
     }
 }
